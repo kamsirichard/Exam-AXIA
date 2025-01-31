@@ -7,7 +7,9 @@ app.use(cors());
 
 
 let users = [];
+let posts = [];
 let userIdCounter = 1;
+let postIdCounter = 1;
 
 
 app.get("/", (req, res) => {
@@ -56,6 +58,54 @@ app.delete("/api/users/:id", (req, res) => {
 
     users.splice(index, 1);
     res.json({ message: "User deleted successfully" });
+});
+
+//Exam 02
+
+
+
+// Create a post
+app.post("/api/posts", (req, res) => {
+    const { userId, title, content } = req.body;
+    if (!userId || !title || !content) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+    const newPost = { id: postIdCounter++, userId, title, content };
+    posts.push(newPost);
+    res.status(201).json(newPost);
+});
+
+// Get all posts
+app.get("/api/posts", (req, res) => {
+    res.json(posts);
+});
+
+// Get a single post
+app.get("/api/posts/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.json(post);
+});
+
+// Update a post
+app.put("/api/posts/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const { title, content } = req.body;
+    if (title) post.title = title;
+    if (content) post.content = content;
+
+    res.json(post);
+});
+
+// Delete a post
+app.delete("/api/posts/:id", (req, res) => {
+    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
+    if (index === -1) return res.status(404).json({ message: "Post not found" });
+
+    posts.splice(index, 1);
+    res.json({ message: "Post deleted successfully" });
 });
 
 
